@@ -1,0 +1,34 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQAudioRecorderController Demo", "IQAudioRecorderController Demo\IQAudioRecorderController Demo.csproj", "{995f7117-f6b2-48ec-aa68-a0a0dd371175}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQAudioRecorderController", "IQAudioRecorderController\IQAudioRecorderController.csproj", "{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}"
+EndProject
+
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+	     {995f7117-f6b2-48ec-aa68-a0a0dd371175}.Debug|iPhone.ActiveCfg = Debug|iPhone
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Debug|iPhone.Build.0 = Debug|iPhone
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Release|iPhone.ActiveCfg = Release|iPhone
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Release|iPhone.Build.0 = Release|iPhone
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+{995f7117-f6b2-48ec-aa68-a0a0dd371175}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Debug|iPhone.ActiveCfg = Debug|iPhone
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Debug|iPhone.Build.0 = Debug|iPhone
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Release|iPhone.ActiveCfg = Release|iPhone
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Release|iPhone.Build.0 = Release|iPhone
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+
+	EndGlobalSection
+EndGlobal
