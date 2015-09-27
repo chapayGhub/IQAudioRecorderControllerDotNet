@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{5187e5c0-e4f9-4b5e-ac38-f0472b95258b}</ProjectGuid>
+    <ProjectGuid>{5187E5C0-E4F9-4B5E-AC38-F0472B95258B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>IQAudioRecorderController</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
@@ -67,25 +67,21 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    	 <BundleResource Include="Resources\audio_record.png" />
-	 <BundleResource Include="Resources\audio_record@2x.png" />
-
+    <BundleResource Include="Resources\audio_record.png" />
+    <BundleResource Include="Resources\audio_record%402x.png" />
   </ItemGroup>
   <ItemGroup>
-    
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Properties\AssemblyInfo.cs" />
-    	 <Compile Include="IIQAudioRecorderControllerDelegate.cs" />
-	 <Compile Include="NSStringExtensions.cs" />
-	 <Compile Include="IQAudioRecorderController.cs" />
-	 <Compile Include="IQInternalAudioRecorderController.cs" />
-	 <Compile Include="SCSiriWaveformView\SCSiriWaveformView.cs" />
-
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IIQAudioRecorderControllerDelegate.cs" />
+    <Compile Include="NSStringExtensions.cs" />
+    <Compile Include="IQAudioRecorderController.cs" />
+    <Compile Include="IQInternalAudioRecorderController.cs" />
+    <Compile Include="SCSiriWaveformView.cs" />
   </ItemGroup>
   <ItemGroup>
-	<Folder Include="SCSiriWaveformView\" />
-	<Folder Include="Resources\" />
-	</ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

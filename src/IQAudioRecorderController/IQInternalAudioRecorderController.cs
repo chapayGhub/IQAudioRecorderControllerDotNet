@@ -3,11 +3,15 @@ using Foundation;
 using AVFoundation;
 using CoreAnimation;
 using UIKit;
+using System.IO;
+using CoreAudioKit;
+using AudioToolbox;
+using CoreGraphics;
 
 namespace IQAudioRecorderController {
     
     
-	internal class IQInternalAudioRecorderController : UIViewController {
+	internal class IQInternalAudioRecorderController : UIViewController,IAVAudioRecorderDelegate {
         
         #region Fields
         private AVAudioRecorder m_audioRecorder;
@@ -62,7 +66,7 @@ namespace IQAudioRecorderController {
         
         private IIQAudioRecorderControllerDelegate _Delegate;
         
-        private Boolean _ShouldShowRemainingTime;
+        private Boolean m_ShouldShowRemainingTime;
         #endregion
         
         #region Properties
@@ -75,12 +79,13 @@ namespace IQAudioRecorderController {
             }
         }
         
+
         private Boolean ShouldShowRemainingTime {
             get {
-                return this._ShouldShowRemainingTime;
+                return this.m_ShouldShowRemainingTime;
             }
             set {
-                this._ShouldShowRemainingTime = value;
+                this.m_ShouldShowRemainingTime = value;
             }
         }
         #endregion
@@ -115,104 +120,123 @@ namespace IQAudioRecorderController {
 			base.ViewDidLoad ();
 
             // 
-            // 
-            //     _navigationTitle = @"Audio Recorder";
-            //     _normalTintColor = [UIColor whiteColor];
-            //     _recordingTintColor = [UIColor colorWithRed:0.0/255.0 green:128.0/255.0 blue:255.0/255.0 alpha:1.0];
-            //     _playingTintColor = [UIColor colorWithRed:255.0/255.0 green:64.0/255.0 blue:64.0/255.0 alpha:1.0];
+             m_navigationTitle = @"Audio Recorder";
+			m_normalTintColor = UIColor.White;
+			m_recordingTintColor = UIColor.FromRGBA(0.0f/255.0f, 128.0f/255.0f,255.0f/255.0f, 1.0f);
+			m_playingTintColor = UIColor.FromRGBA(255.0f/255.0f, 64.0f/255.0f,64.0f/255.0f,1.0f);
+
+
             //     
-            //     this.View.tintColor = _normalTintColor;
-            //     musicFlowView.BackgroundColor = [this.View backgroundColor];
-            // //    musicFlowView.idleAmplitude = 0;
+            this.View.TintColor = m_normalTintColor;
+            mMusicFlowView.BackgroundColor = this.View.BackgroundColor;
+			mMusicFlowView.IdleAmplitude = 0;
+
             // 
-            //     //Unique recording URL
-            //     NSString fileName = [[NSProcessInfo processInfo] globallyUniqueString];
-            //     _recordingFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.m4a",fileName]];
+            //Unique recording URL
+			var fileName = NSProcessInfo.ProcessInfo.GloballyUniqueString;
+
+			var documents = Environment.GetFolderPath (Environment.SpecialFolder.MyDocuments);
+			var tmp = Path.Combine (documents, "..", "tmp");
+
+			m_recordingFilePath = Path.Combine(tmp,String.Format("{0}.m4a",fileName));
+
             // 
-            //     {
-            //         _flexItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:null action:null];
-            //         _flexItem2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:null action:null];
-            //         
-            //         _recordButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"audio_record"] style:UIBarButtonItemStylePlain target:this action:@selector(recordingButtonAction:)];
-            //         _playButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:this action:@selector(playAction:)];
-            //         _pauseButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:this action:@selector(pauseAction:)];
-            //         _trashButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:this action:@selector(deleteAction:)];
-            //         [this setToolbarItems:@[_playButton,_flexItem1, _recordButton,_flexItem2, _trashButton] animated:NO];
-            // 
-            //         _playButton.enabled = false;
-            //         _trashButton.enabled = false;
-            //     }
-            //     
-            //     // Define the recorder setting
-            //     {
-            //         NSMutableDictionary recordSetting = [[NSMutableDictionary alloc] init];
-            //         
-            //         [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatMPEG4AAC] forKey:AVFormatIDKey];
-            //         [recordSetting setValue:[NSNumber numberWithFloat:44100.0] forKey:AVSampleRateKey];
-            //         [recordSetting setValue:[NSNumber numberWithInt: 2] forKey:AVNumberOfChannelsKey];
-            //         
-            //         // Initiate and prepare the recorder
-            //         _audioRecorder = [[AVAudioRecorder alloc] initWithURL:[NSURL fileURLWithPath:_recordingFilePath] settings:recordSetting error:null];
-            //         _audioRecorder.Delegate = this;
-            //         _audioRecorder.meteringEnabled = true;
-            //         
-            //         [musicFlowView setPrimaryWaveLineWidth:3.0f];
-            //         [musicFlowView setSecondaryWaveLineWidth:1.0];
-            //     }
-            // 
-            //     //Navigation Bar Settings
-            //     {
-            //         this.navigationItem.Title = @"Audio Recorder";
-            //         _cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:this action:@selector(cancelAction:)];
-            //         this.navigationItem.leftBarButtonItem = _cancelButton;
-            //         _doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:this action:@selector(doneAction:)];
-            //     }
-            //     
-            //     //Player Duration View
-            //     {
-            //         _viewPlayerDuration = [[UIView alloc] init];
-            //         _viewPlayerDuration.AutoresizingMask = UIViewAutoresizing.FlexibleWidth|UIViewAutoresizing.FlexibleHeight;
-            //         _viewPlayerDuration.BackgroundColor = UIColor.Clear;
-            // 
-            //         _labelCurrentTime = [[UILabel alloc] init];
-            //         _labelCurrentTime.Text = [NSString timeStringForTimeInterval:0];
-            //         _labelCurrentTime.Font = [UIFont boldSystemFontOfSize:14.0];
-            //         _labelCurrentTime.TextColor = _normalTintColor;
-            //         _labelCurrentTime.translatesAutoresizingMaskIntoConstraints = false;
-            // 
-            //         _playerSlider = [[UISlider alloc] initWithFrame:new CGRect(0, 0, this.View.Bounds.Size.Width, 64)];
-            //         _playerSlider.minimumTrackTintColor = _playingTintColor;
-            //         _playerSlider.value = 0;
-            //         [_playerSlider addTarget:this action:@selector(sliderStart:) forControlEvents:UIControlEventTouchDown];
-            //         [_playerSlider addTarget:this action:@selector(sliderMoved:) forControlEvents:UIControlEventValueChanged];
-            //         [_playerSlider addTarget:this action:@selector(sliderEnd:) forControlEvents:UIControlEventTouchUpInside];
-            //         [_playerSlider addTarget:this action:@selector(sliderEnd:) forControlEvents:UIControlEventTouchUpOutside];
-            //         _playerSlider.translatesAutoresizingMaskIntoConstraints = false;
-            // 
-            //         _labelRemainingTime = [[UILabel alloc] init];
-            //         _labelCurrentTime.Text = [NSString timeStringForTimeInterval:0];
-            //         _labelRemainingTime.userInteractionEnabled = true;
-            //         [_labelRemainingTime addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:this action:@selector(tapRecognizer:)]];
-            //         _labelRemainingTime.Font = _labelCurrentTime.Font;
-            //         _labelRemainingTime.TextColor = _labelCurrentTime.TextColor;
-            //         _labelRemainingTime.translatesAutoresizingMaskIntoConstraints = false;
-            //         
-            //         [_viewPlayerDuration addSubview:_labelCurrentTime];
-            //         [_viewPlayerDuration addSubview:_playerSlider];
-            //         [_viewPlayerDuration addSubview:_labelRemainingTime];
-            //         
-            //         NSLayoutConstraint constraintCurrentTimeLeading = [NSLayoutConstraint constraintWithItem:_labelCurrentTime attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_viewPlayerDuration attribute:NSLayoutAttributeLeading multiplier:1 constant:10];
-            //         NSLayoutConstraint constraintCurrentTimeTrailing = [NSLayoutConstraint constraintWithItem:_playerSlider attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_labelCurrentTime attribute:NSLayoutAttributeTrailing multiplier:1 constant:10];
-            //         NSLayoutConstraint constraintRemainingTimeLeading = [NSLayoutConstraint constraintWithItem:_labelRemainingTime attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_playerSlider attribute:NSLayoutAttributeTrailing multiplier:1 constant:10];
-            //         NSLayoutConstraint constraintRemainingTimeTrailing = [NSLayoutConstraint constraintWithItem:_viewPlayerDuration attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:_labelRemainingTime attribute:NSLayoutAttributeTrailing multiplier:1 constant:10];
-            //         
-            //         NSLayoutConstraint constraintCurrentTimeCenter = [NSLayoutConstraint constraintWithItem:_labelCurrentTime attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:_viewPlayerDuration attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
-            //         NSLayoutConstraint constraintSliderCenter = [NSLayoutConstraint constraintWithItem:_playerSlider attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:_viewPlayerDuration attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
-            //         NSLayoutConstraint constraintRemainingTimeCenter = [NSLayoutConstraint constraintWithItem:_labelRemainingTime attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:_viewPlayerDuration attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
-            //         
-            //         [_viewPlayerDuration addConstraints:@[constraintCurrentTimeLeading,constraintCurrentTimeTrailing,constraintRemainingTimeLeading,constraintRemainingTimeTrailing,constraintCurrentTimeCenter,constraintSliderCenter,constraintRemainingTimeCenter]];
-            //     }
-            // }
+             {
+				
+				m_flexItem1 = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace,null,null);
+				m_flexItem2 = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace,null,null);
+                
+				var img = UIImage.FromBundle("audio_record");
+
+				m_recordButton = new UIBarButtonItem(img,UIBarButtonItemStyle.Plain,RecordingButtonAction);
+				m_playButton = new UIBarButtonItem(UIBarButtonSystemItem.Play,PlayAction);
+				m_pauseButton = new UIBarButtonItem(UIBarButtonSystemItem.Pause,PauseAction);
+				m_trashButton = new UIBarButtonItem(UIBarButtonSystemItem.Trash,DeleteAction);
+
+				this.SetToolbarItems (new UIBarButtonItem[]{ m_playButton, m_flexItem1, m_recordButton, m_flexItem2, m_trashButton}, false);
+				         
+                 m_playButton.Enabled = false;
+                 m_trashButton.Enabled = false;
+             }
+				
+             // Define the recorder setting
+             {
+				var audioSettings = new AudioSettings () {
+					Format = AudioFormatType.MPEG4AAC,
+					SampleRate = 44100.0f,
+					NumberChannels = 2,
+				};
+
+				NSError err = null;
+
+				m_audioRecorder = AVAudioRecorder.Create (NSUrl.FromFilename (m_recordingFilePath), audioSettings,out err);
+				                 
+				// Initiate and prepare the recorder
+				m_audioRecorder.WeakDelegate = this;
+				m_audioRecorder.MeteringEnabled = true;
+
+				mMusicFlowView.PrimaryWaveLineWidth = 3.0f;
+				mMusicFlowView.SecondaryWaveLineWidth = 1.0f;
+             }
+ 
+             //Navigation Bar Settings
+             {
+                this.NavigationItem.Title = @"Audio Recorder";
+				m_cancelButton = new UIBarButtonItem(UIBarButtonSystemItem.Cancel,CancelAction);
+				this.NavigationItem.LeftBarButtonItem = m_cancelButton;
+
+				m_doneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, DoneAction);
+             }
+				
+             //Player Duration View
+			{
+				m_viewPlayerDuration = new UIView ();
+				m_viewPlayerDuration.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+				m_viewPlayerDuration.BackgroundColor = UIColor.Clear;
+         
+				m_labelCurrentTime = new UILabel ();
+				m_labelCurrentTime.Text = NSStringExtensions.TimeStringForTimeInterval (0);
+				m_labelCurrentTime.Font =  UIFont.BoldSystemFontOfSize(14.0f);
+				m_labelCurrentTime.TextColor = m_normalTintColor;
+				m_labelCurrentTime.TranslatesAutoresizingMaskIntoConstraints = false;
+         
+				m_playerSlider = new UISlider(new CGRect(0, 0, this.View.Bounds.Size.Width, 64));
+                 m_playerSlider.MinimumTrackTintColor = m_playingTintColor;
+                 m_playerSlider.Value = 0;
+
+				m_playerSlider.TouchDown += SliderStart;
+				m_playerSlider.ValueChanged += SliderMoved;
+				m_playerSlider.TouchUpInside += SliderEnd;
+				m_playerSlider.TouchUpOutside += SliderEnd;
+                 m_playerSlider.TranslatesAutoresizingMaskIntoConstraints = false;
+        
+				m_labelRemainingTime = new UILabel();
+				m_labelCurrentTime.Text = NSStringExtensions.TimeStringForTimeInterval (0);
+                 m_labelRemainingTime.UserInteractionEnabled = true;
+				m_labelRemainingTime.AddGestureRecognizer (new UITapGestureRecognizer(TapRecognizer));
+				m_labelRemainingTime.Font = m_labelCurrentTime.Font;
+                 m_labelRemainingTime.TextColor = m_labelCurrentTime.TextColor;
+                 m_labelRemainingTime.TranslatesAutoresizingMaskIntoConstraints = false;                
+
+				m_viewPlayerDuration.Add (m_labelCurrentTime);
+				m_viewPlayerDuration.Add (m_playerSlider);
+				m_viewPlayerDuration.Add (m_labelRemainingTime);
+				                
+				NSLayoutConstraint constraintCurrentTimeLeading = NSLayoutConstraint.Create (m_labelCurrentTime,NSLayoutAttribute.Leading,NSLayoutRelation.Equal,m_viewPlayerDuration,NSLayoutAttribute.Leading,1.0f, 10.0f);
+				NSLayoutConstraint constraintCurrentTimeTrailing =  NSLayoutConstraint.Create (m_playerSlider,NSLayoutAttribute.Leading,NSLayoutRelation.Equal,m_labelCurrentTime,NSLayoutAttribute.Trailing,1.0f,10);
+
+				NSLayoutConstraint constraintRemainingTimeLeading =  NSLayoutConstraint.Create (m_labelRemainingTime,NSLayoutAttribute.Leading,NSLayoutRelation.Equal,m_playerSlider,NSLayoutAttribute.Trailing,1.0f, 10.0f);
+				NSLayoutConstraint constraintRemainingTimeTrailing =  NSLayoutConstraint.Create (m_viewPlayerDuration,NSLayoutAttribute.Trailing,NSLayoutRelation.Equal,m_labelRemainingTime,NSLayoutAttribute.Trailing,1.0f,10.0f);
+                 
+				NSLayoutConstraint constraintCurrentTimeCenter = NSLayoutConstraint.Create (m_labelCurrentTime,NSLayoutAttribute.CenterY,NSLayoutRelation.Equal,m_viewPlayerDuration,NSLayoutAttribute.CenterY,1.0f,0.0f);
+
+				NSLayoutConstraint constraintSliderCenter = NSLayoutConstraint.Create (m_playerSlider,NSLayoutAttribute.CenterY,NSLayoutRelation.Equal,m_viewPlayerDuration,NSLayoutAttribute.CenterY,1.0f,0.0f);
+
+				NSLayoutConstraint constraintRemainingTimeCenter = NSLayoutConstraint.Create (m_labelRemainingTime,NSLayoutAttribute.CenterY,NSLayoutRelation.Equal,m_viewPlayerDuration,NSLayoutAttribute.CenterY,1.0f,0.0f);
+                 
+				m_viewPlayerDuration.AddConstraints(new NSLayoutConstraint[]{constraintCurrentTimeLeading,constraintCurrentTimeTrailing,constraintRemainingTimeLeading,constraintRemainingTimeTrailing,constraintCurrentTimeCenter,constraintSliderCenter,constraintRemainingTimeCenter});
+             
+			}
         }
         
 		public override void ViewWillAppear(Boolean animated) 
@@ -297,7 +321,7 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void SliderStart(UISlider slider) {
+		private void SliderStart(object item, EventArgs args) {
             // 
             // {
             //     _wasPlaying = _audioPlayer.isPlaying;
@@ -309,14 +333,14 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void SliderMoved(UISlider slider) {
+		private void SliderMoved(object item, EventArgs args) {
             // 
             // {
             //     _audioPlayer.currentTime = slider.value;
             // }
         }
         
-        private void SliderEnd(UISlider slider) {
+		private void SliderEnd(object item, EventArgs args) {
             // 
             // {
             //     if (_wasPlaying)
@@ -327,16 +351,14 @@ namespace IQAudioRecorderController {
         }
         
         private void TapRecognizer(UITapGestureRecognizer gesture) {
-            // 
-            // {
-            //     if (gesture.state == UIGestureRecognizerStateEnded)
-            //     {
-            //         _shouldShowRemainingTime = !_shouldShowRemainingTime;
-            //     }
-            // }
-        }
+
+			if (gesture.State == UIGestureRecognizerState.Ended) {
+				m_ShouldShowRemainingTime = !m_ShouldShowRemainingTime;
+			}
+
+		}
         
-        private void CancelAction(UIBarButtonItem item) {
+		private void CancelAction(object item, EventArgs args) {
             // 
             // {
             //     if ([this.Delegate respondsToSelector:@selector(audioRecorderControllerDidCancel:)])
@@ -349,7 +371,7 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void DoneAction(UIBarButtonItem item) {
+		private void DoneAction(object item, EventArgs args) {
             // 
             // {
             //     if ([this.Delegate respondsToSelector:@selector(audioRecorderController:didFinishWithAudioAtPath:)])
@@ -362,7 +384,7 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void RecordingButtonAction(UIBarButtonItem item) {
+        private void RecordingButtonAction(object item, EventArgs args) {
             // 
             // {
             //     if (_isRecording == NO)
@@ -408,7 +430,7 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void PlayAction(UIBarButtonItem item) {
+		private void PlayAction(object item, EventArgs args) {
             // 
             // {
             //     _oldSessionCategory = [[AVAudioSession sharedInstance] category];
@@ -448,7 +470,7 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void PauseAction(UIBarButtonItem item) {
+		private void PauseAction(object item, EventArgs args) {
             // 
             // {
             //     //UI Update
@@ -473,7 +495,7 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void DeleteAction(UIBarButtonItem item) {
+		private void DeleteAction(object item, EventArgs args) {
             // 
             // {
             //     UIActionSheet actionSheet = [[UIActionSheet alloc] initWithTitle:null delegate:this cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Recording" otherButtonTitles:null, null];
