@@ -7,12 +7,12 @@ using UIKit;
 namespace IQAudioRecorderController {
     
     
-    internal class IQInternalAudioRecorderController {
+	internal class IQInternalAudioRecorderController : UIViewController {
         
         #region Fields
         private AVAudioRecorder m_audioRecorder;
         
-		private SCSiriWaveformView.SCSiriWaveformView mmusicFlowView;
+		private SCSiriWaveformView mMusicFlowView;
         
         private String m_recordingFilePath;
         
@@ -86,33 +86,35 @@ namespace IQAudioRecorderController {
         #endregion
         
         #region Methods
-        private void LoadView() {
+
+
+		/// <summary>
+		/// Loads the view.
+		/// </summary>
+		public override void LoadView() {
             // 
-            // {
-            //     UIView view = new UIView([UIScreen.MainScreen bounds]];
-            //     view.BackgroundColor = [UIColor darkGrayColor];
-            // 
-            //     musicFlowView = [[SCSiriWaveformView alloc] initWithFrame:view.Bounds];
-            //     musicFlowView.translatesAutoresizingMaskIntoConstraints = false;
-            //     [view addSubview:musicFlowView];
-            //     this.View = view;
-            // 
-            //     NSLayoutConstraint constraintRatio = [NSLayoutConstraint constraintWithItem:musicFlowView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:musicFlowView attribute:NSLayoutAttributeHeight multiplier:1.0 constant:0];
-            //     
-            //     NSLayoutConstraint constraintCenterX = [NSLayoutConstraint constraintWithItem:musicFlowView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
-            //     
-            //     NSLayoutConstraint constraintCenterY = [NSLayoutConstraint constraintWithItem:musicFlowView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0];
-            //     
-            //     NSLayoutConstraint constraintWidth = [NSLayoutConstraint constraintWithItem:musicFlowView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:view attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0];
-            //     [musicFlowView addConstraint:constraintRatio];
-            //     [view addConstraints:@[constraintWidth,constraintCenterX,constraintCenterY]];
-            // }
+			var view = new UIView(UIScreen.MainScreen.Bounds);
+			view.BackgroundColor = UIColor.DarkGray;
+			mMusicFlowView = new SCSiriWaveformView(view.Bounds);
+			mMusicFlowView.TranslatesAutoresizingMaskIntoConstraints = false;
+			view.Add (mMusicFlowView);
+	        this.View = view;
+
+			NSLayoutConstraint constraintRatio = NSLayoutConstraint.Create (mMusicFlowView, NSLayoutAttribute.Width, NSLayoutRelation.Equal, mMusicFlowView, NSLayoutAttribute.Height, 1.0f, 0.0f);
+			NSLayoutConstraint constraintCenterX = NSLayoutConstraint.Create (mMusicFlowView,NSLayoutAttribute.CenterX ,NSLayoutRelation.Equal,view,NSLayoutAttribute.CenterX,1.0f,0.0f);
+			NSLayoutConstraint constraintCenterY = NSLayoutConstraint.Create (mMusicFlowView,NSLayoutAttribute.CenterY,NSLayoutRelation.Equal,view,NSLayoutAttribute.CenterY,1.0f, 0.0f);
+			NSLayoutConstraint constraintWidth = NSLayoutConstraint.Create (mMusicFlowView,NSLayoutAttribute.Width,NSLayoutRelation.Equal,view,NSLayoutAttribute.Width,1.0f,0.0f);
+
+			mMusicFlowView.AddConstraint (constraintRatio);
+			view.AddConstraints (new NSLayoutConstraint[]{constraintWidth, constraintCenterX, constraintCenterY});
+
         }
         
-        private void ViewDidLoad() {
+		public override void ViewDidLoad()
+		{
+			base.ViewDidLoad ();
+
             // 
-            // {
-            //     [super viewDidLoad];
             // 
             //     _navigationTitle = @"Audio Recorder";
             //     _normalTintColor = [UIColor whiteColor];
@@ -213,16 +215,15 @@ namespace IQAudioRecorderController {
             // }
         }
         
-        private void ViewWillAppear(Boolean animated) {
-            // 
-            // {
-            //     [super viewWillAppear:animated];
-            //     
-            //     [this startUpdatingMeter];
-            // }
+		public override void ViewWillAppear(Boolean animated) 
+		{
+			base.ViewWillAppear (animated);
+
+			StartUpdatingMeter ();
+		
         }
         
-        private void ViewWillDisappear(Boolean animated) {
+		public override void ViewWillDisappear(Boolean animated) {
             // 
             // {
             //     [super viewWillDisappear:animated];

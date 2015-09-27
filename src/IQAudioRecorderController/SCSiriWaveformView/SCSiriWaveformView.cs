@@ -2,7 +2,7 @@ using System;
 using UIKit;
 using CoreGraphics;
 
-namespace IQAudioRecorderController.SCSiriWaveformView {
+namespace IQAudioRecorderController {
     
     
     public class SCSiriWaveformView : UIView {
