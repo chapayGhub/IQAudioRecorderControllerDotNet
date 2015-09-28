@@ -11,7 +11,7 @@ using CoreGraphics;
 namespace IQAudioRecorderController {
     
     
-	internal class IQInternalAudioRecorderController : UIViewController,IAVAudioRecorderDelegate {
+	internal class IQInternalAudioRecorderController : UIViewController,IAVAudioRecorderDelegate, IAVAudioPlayerDelegate {
         
         #region Fields
         private AVAudioRecorder m_audioRecorder;
@@ -278,6 +278,9 @@ namespace IQAudioRecorderController {
 
         }
         
+		/// <summary>
+		/// Updates the meters.
+		/// </summary>
         private void UpdateMeters() {
 
 
@@ -312,59 +315,82 @@ namespace IQAudioRecorderController {
 
         }
         
-        private void StartUpdatingMeter() {
-            // 
-            // {
-            //     [meterUpdateDisplayLink invalidate];
-            //     meterUpdateDisplayLink = [CADisplayLink displayLinkWithTarget:this selector:@selector(updateMeters)];
-            //     [meterUpdateDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-            // }
+		/// <summary>
+		/// Starts the updating meter.
+		/// </summary>
+        private void StartUpdatingMeter() 
+		{
+			mmeterUpdateDisplayLink.Invalidate ();
+			mmeterUpdateDisplayLink = CADisplayLink.Create (UpdateMeters);
+			mmeterUpdateDisplayLink.AddToRunLoop (NSRunLoop.Current, NSRunLoopMode.Common);
+
         }
         
-        private void StopUpdatingMeter() {
-            // 
-            // {
-            //     [meterUpdateDisplayLink invalidate];
-            //     meterUpdateDisplayLink = null;
-            // }
+		/// <summary>
+		/// Stops the updating meter.
+		/// </summary>
+        private void StopUpdatingMeter() 
+		{
+			mmeterUpdateDisplayLink.Invalidate ();
+			mmeterUpdateDisplayLink = null;
         }
         
+		/// <summary>
+		/// Updates the play progress.
+		/// </summary>
         private void UpdatePlayProgress() {
-            // 
-            // {
-            //     _labelCurrentTime.Text = [NSString timeStringForTimeInterval:_audioPlayer.currentTime];
-            //     _labelRemainingTime.Text = [NSString timeStringForTimeInterval:(_shouldShowRemainingTime)?(_audioPlayer.duration-_audioPlayer.currentTime):_audioPlayer.duration];
-            //     [_playerSlider setValue:_audioPlayer.currentTime animated:YES];
-            // }
+ 
+			m_labelCurrentTime.Text = NSStringExtensions.TimeStringForTimeInterval(m_audioPlayer.CurrentTime);
+
+			m_labelRemainingTime.Text = NSStringExtensions.TimeStringForTimeInterval((m_ShouldShowRemainingTime) ?  (m_audioPlayer.Duration - m_audioPlayer.CurrentTime) : m_audioPlayer.Duration);
+
+			m_playerSlider.SetValue ((float)m_audioPlayer.CurrentTime, true);
+
         }
         
+		/// <summary>
+		/// Sliders the start.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		/// <param name="args">Arguments.</param>
 		private void SliderStart(object item, EventArgs args) {
-            // 
-            // {
-            //     _wasPlaying = _audioPlayer.isPlaying;
-            //     
-            //     if (_audioPlayer.isPlaying)
-            //     {
-            //         [_audioPlayer pause];
-            //     }
-            // }
+            
+		     m_wasPlaying = m_audioPlayer.Playing;
+		     
+		     if (m_audioPlayer.Playing)
+		     {
+				m_audioPlayer.Pause ();
+		     }
         }
         
-		private void SliderMoved(object item, EventArgs args) {
-            // 
-            // {
-            //     _audioPlayer.currentTime = slider.value;
-            // }
+		/// <summary>
+		/// Sliders the moved.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		/// <param name="args">Arguments.</param>
+		private void SliderMoved(object item, EventArgs args) 
+		{
+         
+			if (item is UISlider) 
+			{
+				m_audioPlayer.CurrentTime = ((UISlider)item).Value;
+			}
+
+
         }
         
+		/// <summary>
+		/// Sliders the end.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		/// <param name="args">Arguments.</param>
 		private void SliderEnd(object item, EventArgs args) {
-            // 
-            // {
-            //     if (_wasPlaying)
-            //     {
-            //         [_audioPlayer play];
-            //     }
-            // }
+
+		     if (m_wasPlaying)
+		     {
+				m_audioPlayer.Play();
+		     }
+
         }
         
         private void TapRecognizer(UITapGestureRecognizer gesture) {
@@ -375,116 +401,113 @@ namespace IQAudioRecorderController {
 
 		}
         
-		private void CancelAction(object item, EventArgs args) {
-            // 
-            // {
-            //     if ([this.Delegate respondsToSelector:@selector(audioRecorderControllerDidCancel:)])
-            //     {
-            //         IQAudioRecorderController controller = (IQAudioRecorderController)[this navigationController];
-            //         [this.Delegate audioRecorderControllerDidCancel:controller];
-            //     }
-            //     
-            //     [this dismissViewControllerAnimated:YES completion:null];
-            // }
+		private void CancelAction(object item, EventArgs args) 
+		{
+			if (this.Delegate != null) 
+			{
+				var controller = (IQAudioRecorderController)this.NavigationController;
+				this.Delegate.AudioRecorderControllerDidCancel (controller);
+			}
+
+			this.DismissViewController (true, null);
+		
         }
         
 		private void DoneAction(object item, EventArgs args) {
-            // 
-            // {
-            //     if ([this.Delegate respondsToSelector:@selector(audioRecorderController:didFinishWithAudioAtPath:)])
-            //     {
-            //         IQAudioRecorderController controller = (IQAudioRecorderController)[this navigationController];
-            //         [this.Delegate audioRecorderController:controller didFinishWithAudioAtPath:_recordingFilePath];
-            //     }
-            //     
-            //     [this dismissViewControllerAnimated:YES completion:null];
-            // }
+
+			if (this.Delegate != null) 
+			{
+				var controller = (IQAudioRecorderController)this.NavigationController;
+				this.Delegate.AudioRecorderController (controller, m_recordingFilePath);
+			}
+
+			this.DismissViewController (true, null);
         }
         
         private void RecordingButtonAction(object item, EventArgs args) {
-            // 
-            // {
-            //     if (_isRecording == NO)
-            //     {
-            //         _isRecording = true;
-            // 
-            //         //UI Update
-            //         {
-            //             [this showNavigationButton:NO];
-            //             _recordButton.tintColor = _recordingTintColor;
-            //             _playButton.enabled = false;
-            //             _trashButton.enabled = false;
-            //         }
-            //         
-            //         /
-            //          Create the recorder
-            //          /
-            //         if ([[NSFileManager defaultManager] fileExistsAtPath:_recordingFilePath])
-            //         {
-            //             [[NSFileManager defaultManager] removeItemAtPath:_recordingFilePath error:null];
-            //         }
-            //         
-            //         _oldSessionCategory = [[AVAudioSession sharedInstance] category];
-            //         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:null];
-            //         [_audioRecorder prepareToRecord];
-            //         [_audioRecorder record];
-            //     }
-            //     else
-            //     {
-            //         _isRecording = false;
-            //         
-            //         //UI Update
-            //         {
-            //             [this showNavigationButton:YES];
-            //             _recordButton.tintColor = _normalTintColor;
-            //             _playButton.enabled = true;
-            //             _trashButton.enabled = true;
-            //         }
-            // 
-            //         [_audioRecorder stop];
-            //         [[AVAudioSession sharedInstance] setCategory:_oldSessionCategory error:null];
-            //     }
-            // }
+         
+             if (m_isRecording == false)
+             {
+                 m_isRecording = true;
+         
+                 //UI Update
+                 {
+					this.ShowNavigationButton(false);
+
+                    m_recordButton.TintColor = m_recordingTintColor;
+                    m_playButton.Enabled = false;
+                    m_trashButton.Enabled = false;
+                 }
+                 
+				if (File.Exists(m_recordingFilePath))
+					File.Delete(m_recordingFilePath);
+				
+				m_oldSessionCategory = AVAudioSession.SharedInstance().Category;
+
+				AVAudioSession.SharedInstance ().SetCategory (AVAudioSessionCategory.Record);
+				m_audioRecorder.PrepareToRecord ();
+				m_audioRecorder.Record ();
+
+             }
+             else
+             {
+                 m_isRecording = false;
+                 
+                 //UI Update
+                 {
+					this.ShowNavigationButton(true);
+
+                     m_recordButton.TintColor = m_normalTintColor;
+                     m_playButton.Enabled = true;
+                     m_trashButton.Enabled = true;
+                 }
+       
+				m_audioRecorder.Stop();
+				AVAudioSession.SharedInstance ().SetCategory (new NSString(m_oldSessionCategory));
+             }
         }
         
 		private void PlayAction(object item, EventArgs args) {
-            // 
-            // {
-            //     _oldSessionCategory = [[AVAudioSession sharedInstance] category];
-            //     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:null];
+
+			m_oldSessionCategory = AVAudioSession.SharedInstance().Category;
+			AVAudioSession.SharedInstance ().SetCategory (AVAudioSessionCategory.Playback);
+
             //     
-            //     _audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:_recordingFilePath] error:null];
-            //     _audioPlayer.Delegate = this;
-            //     _audioPlayer.meteringEnabled = true;
-            //     [_audioPlayer prepareToPlay];
-            //     [_audioPlayer play];
-            //     
-            //     //UI Update
-            //     {
-            //         [this setToolbarItems:@[_pauseButton,_flexItem1, _recordButton,_flexItem2, _trashButton] animated:YES];
-            //         [this showNavigationButton:NO];
-            //         _recordButton.enabled = false;
-            //         _trashButton.enabled = false;
-            //     }
-            //     
-            //     //Start regular update
-            //     {
-            //         _playerSlider.value = _audioPlayer.currentTime;
-            //         _playerSlider.maximumValue = _audioPlayer.duration;
-            //         _viewPlayerDuration.Frame = this.navigationController.navigationBar.Bounds;
-            //         
-            //         _labelCurrentTime.Text = [NSString timeStringForTimeInterval:_audioPlayer.currentTime];
-            //         _labelRemainingTime.Text = [NSString timeStringForTimeInterval:(_shouldShowRemainingTime)?(_audioPlayer.duration-_audioPlayer.currentTime):_audioPlayer.duration];
-            // 
-            //         [_viewPlayerDuration setNeedsLayout];
-            //         [_viewPlayerDuration layoutIfNeeded];
-            //         this.navigationItem.TitleView = _viewPlayerDuration;
-            // 
-            //         [playProgressDisplayLink invalidate];
-            //         playProgressDisplayLink = [CADisplayLink displayLinkWithTarget:this selector:@selector(updatePlayProgress)];
-            //         [playProgressDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-            //     }
-            // }
+			m_audioPlayer = AVAudioPlayer.FromUrl(NSUrl.FromFilename(m_recordingFilePath));
+            m_audioPlayer.Delegate = this;
+            m_audioPlayer.MeteringEnabled = true;
+			m_audioPlayer.PrepareToPlay();
+			m_audioPlayer.Play();
+			    
+	         //UI Update
+	         {
+				this.SetToolbarItems (new UIBarButtonItem[]{ m_pauseButton,m_flexItem1, m_recordButton,m_flexItem2, m_trashButton}, true);
+
+				this.ShowNavigationButton (false);
+
+	             m_recordButton.Enabled = false;
+	             m_trashButton.Enabled = false;
+	         }
+ 
+             //Start regular update
+             {
+				m_playerSlider.Value = (float)m_audioPlayer.CurrentTime;
+				m_playerSlider.MaxValue = (float)m_audioPlayer.Duration;
+                 m_viewPlayerDuration.Frame = this.NavigationController.NavigationBar.Bounds;
+                 
+				m_labelCurrentTime.Text = NSStringExtensions.TimeStringForTimeInterval (m_audioPlayer.CurrentTime);
+				m_labelRemainingTime.Text = NSStringExtensions.TimeStringForTimeInterval((m_ShouldShowRemainingTime) ? (m_audioPlayer.Duration - m_audioPlayer.CurrentTime): m_audioPlayer.Duration);
+
+				m_viewPlayerDuration.SetNeedsLayout();
+				m_viewPlayerDuration.LayoutIfNeeded();
+
+                this.NavigationItem.TitleView = m_viewPlayerDuration;
+
+				mplayProgressDisplayLink.Invalidate ();
+				mplayProgressDisplayLink = CADisplayLink.Create (UpdatePlayProgress);
+				mplayProgressDisplayLink.AddToRunLoop (NSRunLoop.Current, NSRunLoopMode.Common);
+
+             }
         }
         
 		private void PauseAction(object item, EventArgs args) {
@@ -567,17 +590,11 @@ namespace IQAudioRecorderController {
         }
         
         private void AudioRecorderDidFinishRecording(AVAudioRecorder recorder, Boolean flag) {
-            // 
-            // {
-            //     
-            // }
+
         }
         
         private void AudioRecorderEncodeErrorDidOccur(AVAudioRecorder recorder, NSError error) {
-            // 
-            // {
-            // //    NSLog(@"%@: %@",NSStringFromSelector(_cmd),error);
-            // }
+
         }
         #endregion
     }
