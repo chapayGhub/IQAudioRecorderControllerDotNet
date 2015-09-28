@@ -159,7 +159,11 @@ namespace IQAudioRecorderController {
              
         }
         
-        private void UpdateWithLevel(nfloat level)
+		/// <summary>
+		/// Updates the with level.
+		/// </summary>
+		/// <param name="level">Level.</param>
+        public void UpdateWithLevel(nfloat level)
 		{
 			
             this.Phase += this.PhaseShift;

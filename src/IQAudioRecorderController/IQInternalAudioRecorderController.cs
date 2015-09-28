@@ -70,6 +70,11 @@ namespace IQAudioRecorderController {
         #endregion
         
         #region Properties
+
+		/// <summary>
+		/// Gets or sets the delegate.
+		/// </summary>
+		/// <value>The delegate.</value>
         private IIQAudioRecorderControllerDelegate Delegate {
             get {
                 return this._Delegate;
@@ -80,6 +85,11 @@ namespace IQAudioRecorderController {
         }
         
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this
+		/// <see cref="IQAudioRecorderController.IQInternalAudioRecorderController"/> should show remaining time.
+		/// </summary>
+		/// <value><c>true</c> if should show remaining time; otherwise, <c>false</c>.</value>
         private Boolean ShouldShowRemainingTime {
             get {
                 return this.m_ShouldShowRemainingTime;
@@ -125,13 +135,11 @@ namespace IQAudioRecorderController {
 			m_recordingTintColor = UIColor.FromRGBA(0.0f/255.0f, 128.0f/255.0f,255.0f/255.0f, 1.0f);
 			m_playingTintColor = UIColor.FromRGBA(255.0f/255.0f, 64.0f/255.0f,64.0f/255.0f,1.0f);
 
-
             //     
             this.View.TintColor = m_normalTintColor;
             mMusicFlowView.BackgroundColor = this.View.BackgroundColor;
 			mMusicFlowView.IdleAmplitude = 0;
 
-            // 
             //Unique recording URL
 			var fileName = NSProcessInfo.ProcessInfo.GloballyUniqueString;
 
@@ -139,8 +147,6 @@ namespace IQAudioRecorderController {
 			var tmp = Path.Combine (documents, "..", "tmp");
 
 			m_recordingFilePath = Path.Combine(tmp,String.Format("{0}.m4a",fileName));
-
-            // 
              {
 				
 				m_flexItem1 = new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace,null,null);
@@ -158,7 +164,7 @@ namespace IQAudioRecorderController {
                  m_playButton.Enabled = false;
                  m_trashButton.Enabled = false;
              }
-				
+										
              // Define the recorder setting
              {
 				var audioSettings = new AudioSettings () {
@@ -239,6 +245,10 @@ namespace IQAudioRecorderController {
 			}
         }
         
+		/// <summary>
+		/// Views the will appear.
+		/// </summary>
+		/// <param name="animated">If set to <c>true</c> animated.</param>
 		public override void ViewWillAppear(Boolean animated) 
 		{
 			base.ViewWillAppear (animated);
@@ -247,52 +257,59 @@ namespace IQAudioRecorderController {
 		
         }
         
-		public override void ViewWillDisappear(Boolean animated) {
-            // 
-            // {
-            //     [super viewWillDisappear:animated];
+		/// <summary>
+		/// Views the will disappear.
+		/// </summary>
+		/// <param name="animated">If set to <c>true</c> animated.</param>
+		public override void ViewWillDisappear(Boolean animated) 
+		{
+			base.ViewDidDisappear (animated);
+
             //     
-            //     _audioPlayer.Delegate = null;
-            //     [_audioPlayer stop];
-            //     _audioPlayer = null;
-            //     
-            //     _audioRecorder.Delegate = null;
-            //     [_audioRecorder stop];
-            //     _audioRecorder = null;
-            //     
-            //     [this stopUpdatingMeter];
-            // }
+             m_audioPlayer.Delegate = null;
+			m_audioPlayer.Stop ();
+             m_audioPlayer = null;
+             
+             m_audioRecorder.Delegate = null;
+			m_audioRecorder.Stop();
+             m_audioRecorder = null;
+             
+			StopUpdatingMeter ();
+
         }
         
         private void UpdateMeters() {
-            // 
-            // {
-            //     if (_audioRecorder.isRecording)
-            //     {
-            //         [_audioRecorder updateMeters];
-            //         
-            //         CGFloat normalizedValue = pow (10, [_audioRecorder averagePowerForChannel:0] / 20);
-            //         
-            //         [musicFlowView setWaveColor:_recordingTintColor];
-            //         [musicFlowView updateWithLevel:normalizedValue];
-            //         
-            //         this.navigationItem.Title = [NSString timeStringForTimeInterval:_audioRecorder.currentTime];
-            //     }
-            //     else if (_audioPlayer.isPlaying)
-            //     {
-            //         [_audioPlayer updateMeters];
-            //         
-            //         CGFloat normalizedValue = pow (10, [_audioPlayer averagePowerForChannel:0] / 20);
-            //         
-            //         [musicFlowView setWaveColor:_playingTintColor];
-            //         [musicFlowView updateWithLevel:normalizedValue];
-            //     }
-            //     else
-            //     {
-            //         [musicFlowView setWaveColor:_normalTintColor];
-            //         [musicFlowView updateWithLevel:0];
-            //     }
-            // }
+
+
+			if (m_audioRecorder.Recording)
+		     {
+				m_audioRecorder.UpdateMeters();
+		         
+				var normalizedValue = Math.Pow (10, m_audioRecorder.AveragePower(0) / 20);
+		         
+				mMusicFlowView.WaveColor = m_recordingTintColor;
+				mMusicFlowView.UpdateWithLevel ((nfloat)normalizedValue);
+
+				this.NavigationItem.Title = NSStringExtensions.TimeStringForTimeInterval (m_audioRecorder.currentTime);
+
+		     }
+			else if (m_audioPlayer.Playing)
+			{
+				m_audioPlayer.UpdateMeters();
+
+				var normalizedValue = Math.Pow (10, m_audioPlayer.AveragePower(0) / 20);
+
+				mMusicFlowView.WaveColor = m_playingTintColor;
+				mMusicFlowView.UpdateWithLevel ((nfloat)normalizedValue);
+
+			}
+		     else
+		     {
+
+				mMusicFlowView.WaveColor = m_normalTintColor;
+				mMusicFlowView.UpdateWithLevel (0);
+		     }
+
         }
         
         private void StartUpdatingMeter() {
