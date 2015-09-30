@@ -9,47 +9,51 @@ namespace IQAudioRecorderController {
         
         #region Fields
         private IIQAudioRecorderControllerDelegate _Delegate;
+
+		private IQInternalAudioRecorderController m_internalController;
         #endregion
         
         #region Properties
+
+		/// <summary>
+		/// Gets or sets the delegate.
+		/// </summary>
+		/// <value>The delegate.</value>
         public IIQAudioRecorderControllerDelegate Delegate {
             get {
                 return this._Delegate;
             }
-            set {
+            set 
+			{
                 this._Delegate = value;
+				m_internalController.Delegate = value;
             }
         }
         #endregion
         
         #region Methods
         public override void ViewDidLoad() {
-            // 
-            // {
-            //     [super viewDidLoad];
+
+			base.ViewDidLoad ();
+
             //     
-            //     _internalController = [[IQInternalAudioRecorderController alloc] init];
-            //     _internalController.Delegate = this.Delegate;
+			m_internalController = new IQInternalAudioRecorderController();
+            m_internalController.Delegate = this.Delegate;
+
             //     
-            //     this.ViewControllers = @[_internalController];
-            //     this.navigationBar.tintColor = [UIColor whiteColor];
-            //     this.navigationBar.translucent = true;
-            //     this.navigationBar.barStyle = UIBarStyleBlackTranslucent;
-            //     
-            //     this.toolbarHidden = false;
-            //     this.toolbar.tintColor = this.navigationBar.tintColor;
-            //     this.toolbar.translucent = this.navigationBar.translucent;
-            //     this.toolbar.barStyle = this.navigationBar.barStyle;
-            // }
+			this.ViewControllers = new UIViewController[]{m_internalController};
+
+			this.NavigationBar.TintColor = UIColor.White;
+             this.NavigationBar.Translucent = true;
+             this.NavigationBar.BarStyle = UIBarStyle.BlackTranslucent;
+             
+             this.ToolbarHidden = false;
+             this.Toolbar.TintColor = this.NavigationBar.TintColor;
+             this.Toolbar.Translucent = this.NavigationBar.Translucent;
+             this.Toolbar.BarStyle = this.NavigationBar.BarStyle;
+
         }
         
-        private void SetDelegate(IIQAudioRecorderControllerDelegate del) {
-            // 
-            // {
-            //     _delegate = delegate;
-            //     _internalController.Delegate = delegate;
-            // }
-        }
         #endregion
     }
 }

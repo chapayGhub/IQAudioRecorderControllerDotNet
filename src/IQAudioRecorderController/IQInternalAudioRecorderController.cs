@@ -11,7 +11,7 @@ using CoreGraphics;
 namespace IQAudioRecorderController {
     
     
-	internal class IQInternalAudioRecorderController : UIViewController,IAVAudioRecorderDelegate, IAVAudioPlayerDelegate {
+	internal class IQInternalAudioRecorderController : UIViewController {
         
         #region Fields
         private AVAudioRecorder m_audioRecorder;
@@ -75,7 +75,7 @@ namespace IQAudioRecorderController {
 		/// Gets or sets the delegate.
 		/// </summary>
 		/// <value>The delegate.</value>
-        private IIQAudioRecorderControllerDelegate Delegate {
+        public IIQAudioRecorderControllerDelegate Delegate {
             get {
                 return this._Delegate;
             }
@@ -125,6 +125,9 @@ namespace IQAudioRecorderController {
 
         }
         
+		/// <summary>
+		/// Views the did load.
+		/// </summary>
 		public override void ViewDidLoad()
 		{
 			base.ViewDidLoad ();
@@ -393,6 +396,10 @@ namespace IQAudioRecorderController {
 
         }
         
+		/// <summary>
+		/// Taps the recognizer.
+		/// </summary>
+		/// <param name="gesture">Gesture.</param>
         private void TapRecognizer(UITapGestureRecognizer gesture) {
 
 			if (gesture.State == UIGestureRecognizerState.Ended) {
@@ -467,6 +474,11 @@ namespace IQAudioRecorderController {
              }
         }
         
+		/// <summary>
+		/// Plaies the action.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		/// <param name="args">Arguments.</param>
 		private void PlayAction(object item, EventArgs args) {
 
 			m_oldSessionCategory = AVAudioSession.SharedInstance().Category;
@@ -474,7 +486,7 @@ namespace IQAudioRecorderController {
 
             //     
 			m_audioPlayer = AVAudioPlayer.FromUrl(NSUrl.FromFilename(m_recordingFilePath));
-            m_audioPlayer.Delegate = this;
+            m_audioPlayer.WeakDelegate = this;
             m_audioPlayer.MeteringEnabled = true;
 			m_audioPlayer.PrepareToPlay();
 			m_audioPlayer.Play();
@@ -510,92 +522,107 @@ namespace IQAudioRecorderController {
              }
         }
         
+		/// <summary>
+		/// Pauses the action.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		/// <param name="args">Arguments.</param>
 		private void PauseAction(object item, EventArgs args) {
             // 
-            // {
-            //     //UI Update
-            //     {
-            //         [this setToolbarItems:@[_playButton,_flexItem1, _recordButton,_flexItem2, _trashButton] animated:YES];
-            //         [this showNavigationButton:YES];
-            //         _recordButton.enabled = true;
-            //         _trashButton.enabled = true;
-            //     }
+             //UI Update
+             {
+				this.SetToolbarItems (new UIBarButtonItem[]{m_playButton,m_flexItem1, m_recordButton,m_flexItem2, m_trashButton }, true);
+
+				this.ShowNavigationButton (true);
+
+                 m_recordButton.Enabled = true;
+                 m_trashButton.Enabled = true;
+             }
             //     
-            //     {
-            //         [playProgressDisplayLink invalidate];
-            //         playProgressDisplayLink = null;
-            //         this.navigationItem.TitleView = null;
-            //     }
+             {
+				mplayProgressDisplayLink.Invalidate ();
+				mplayProgressDisplayLink = null;
+                this.NavigationItem.TitleView = null;
+             }
             // 
-            //     _audioPlayer.Delegate = null;
-            //     [_audioPlayer stop];
-            //     _audioPlayer = null;
-            //     
-            //     [[AVAudioSession sharedInstance] setCategory:_oldSessionCategory error:null];
-            // }
-        }
-        
-		private void DeleteAction(object item, EventArgs args) {
-            // 
-            // {
-            //     UIActionSheet actionSheet = [[UIActionSheet alloc] initWithTitle:null delegate:this cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete Recording" otherButtonTitles:null, null];
-            //     actionSheet.tag = 1;
-            //     [actionSheet showInView:this.View];
-            // }
-        }
-        
-        private void ClickedButtonAtIndex(UIActionSheet actionSheet, nint buttonIndex) {
-            // 
-            // {
-            //     if (actionSheet.tag == 1)
-            //     {
-            //         if (buttonIndex == actionSheet.destructiveButtonIndex)
-            //         {
-            //             [[NSFileManager defaultManager] removeItemAtPath:_recordingFilePath error:null];
-            //             
-            //             _playButton.enabled = false;
-            //             _trashButton.enabled = false;
-            //             [this.navigationItem setRightBarButtonItem:null animated:YES];
-            //             this.navigationItem.Title = _navigationTitle;
-            //         }
-            //     }
-            // }
-        }
-        
-        private void ShowNavigationButton(Boolean show) {
-            // 
-            // {
-            //     if (show)
-            //     {
-            //         [this.navigationItem setLeftBarButtonItem:_cancelButton animated:YES];
-            //         [this.navigationItem setRightBarButtonItem:_doneButton animated:YES];
-            //     }
-            //     else
-            //     {
-            //         [this.navigationItem setLeftBarButtonItem:null animated:YES];
-            //         [this.navigationItem setRightBarButtonItem:null animated:YES];
-            //     }
-            // }
-        }
-        
-        private void AudioPlayerDidFinishPlaying(AVAudioPlayer player, Boolean flag) {
-            // 
-            // {
-            //     //To update UI on stop playing
-            //     NSInvocation invocation = [NSInvocation invocationWithMethodSignature:[_pauseButton.target methodSignatureForSelector:_pauseButton.action]];
-            //     invocation.target = _pauseButton.target;
-            //     invocation.selector = _pauseButton.action;
-            //     [invocation invoke];
-            // }
-        }
-        
-        private void AudioRecorderDidFinishRecording(AVAudioRecorder recorder, Boolean flag) {
+             m_audioPlayer.Delegate = null;
+		     m_audioPlayer.Stop();
+             m_audioPlayer = null;
+
+
+			AVAudioSession.SharedInstance ().SetCategory(new NSString(m_oldSessionCategory));
 
         }
         
-        private void AudioRecorderEncodeErrorDidOccur(AVAudioRecorder recorder, NSError error) {
+		/// <summary>
+		/// Deletes the action.
+		/// </summary>
+		/// <param name="item">Item.</param>
+		/// <param name="args">Arguments.</param>
+		private void DeleteAction(object item, EventArgs args) 
+		{
+			UIActionSheet actionSheet = new UIActionSheet (String.Empty, null, "Cancel", "Delete Recording", null);
+			actionSheet.Tag = 1;
+
+			actionSheet.Clicked += delegate(object sender, UIButtonEventArgs e) {
+
+				if (e.ButtonIndex == ((UIActionSheet)sender).DestructiveButtonIndex)
+		         {
+					File.Delete(m_recordingFilePath);
+		             
+		             m_playButton.Enabled = false;
+		             m_trashButton.Enabled = false;
+
+					this.NavigationItem.SetRightBarButtonItem(null,true);
+
+		             this.NavigationItem.Title = m_navigationTitle;
+		         }
+
+			};
+			actionSheet.ShowInView (this.View);
+		
+        }
+        
+        /// <summary>
+        /// Shows the navigation button.
+        /// </summary>
+        /// <param name="show">If set to <c>true</c> show.</param>
+        private void ShowNavigationButton(Boolean show) {
+
+             if (show)
+             {
+				this.NavigationItem.SetLeftBarButtonItem(m_cancelButton,true);
+				this.NavigationItem.SetRightBarButtonItem(m_doneButton,true);
+             }
+             else
+             {
+				this.NavigationItem.SetLeftBarButtonItem(null,true);
+				this.NavigationItem.SetRightBarButtonItem(null,true);
+             }
+
+        }
+        
+		[Export ("audioPlayerDidFinishPlaying:successfully:")]
+		/// <summary>
+		/// Audios the player did finish playing.
+		/// </summary>
+		/// <param name="player">Player.</param>
+		/// <param name="flag">If set to <c>true</c> flag.</param>
+        private void AudioPlayerDidFinishPlaying(AVAudioPlayer player, Boolean flag) 
+		{
+			PauseAction (this, new EventArgs ());
+        }
+        
+		[Export ("audioRecorderDidFinishRecording:successfully:")]
+        public void AudioRecorderDidFinishRecording(AVAudioRecorder recorder, Boolean flag) {
+
+        }
+        
+		[Export ("audioRecorderEncodeErrorDidOccur:error:")]
+        public void AudioRecorderEncodeErrorDidOccur(AVAudioRecorder recorder, NSError error) {
 
         }
         #endregion
     }
+		
 }
