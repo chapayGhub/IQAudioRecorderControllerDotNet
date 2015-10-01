@@ -8,7 +8,7 @@ namespace IQAudioRecorderController {
     public class IQAudioRecorderController : UINavigationController {
         
         #region Fields
-        private IIQAudioRecorderControllerDelegate _Delegate;
+        private IQAudioRecorderControllerDelegate _Delegate;
 
 		private IQInternalAudioRecorderController m_internalController;
         #endregion
@@ -19,7 +19,7 @@ namespace IQAudioRecorderController {
 		/// Gets or sets the delegate.
 		/// </summary>
 		/// <value>The delegate.</value>
-        public IIQAudioRecorderControllerDelegate Delegate {
+        public IQAudioRecorderControllerDelegate Delegate {
             get {
                 return this._Delegate;
             }

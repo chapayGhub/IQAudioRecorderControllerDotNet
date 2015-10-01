@@ -3,7 +3,7 @@ using System;
 namespace IQAudioRecorderController {
     
     
-    public interface IIQAudioRecorderControllerDelegate {
+    public interface IQAudioRecorderControllerDelegate {
         
         void AudioRecorderController(IQAudioRecorderController controller, String filePath);
         

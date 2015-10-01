@@ -64,7 +64,7 @@ namespace IQAudioRecorderController {
         
         private UIColor m_playingTintColor;
         
-        private IIQAudioRecorderControllerDelegate _Delegate;
+        private IQAudioRecorderControllerDelegate _Delegate;
         
         private Boolean m_ShouldShowRemainingTime;
         #endregion
@@ -75,7 +75,7 @@ namespace IQAudioRecorderController {
 		/// Gets or sets the delegate.
 		/// </summary>
 		/// <value>The delegate.</value>
-        public IIQAudioRecorderControllerDelegate Delegate {
+        public IQAudioRecorderControllerDelegate Delegate {
             get {
                 return this._Delegate;
             }
