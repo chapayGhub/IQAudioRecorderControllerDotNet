@@ -396,6 +396,7 @@ namespace IQAudioRecorderController {
 
         }
         
+
 		/// <summary>
 		/// Taps the recognizer.
 		/// </summary>
