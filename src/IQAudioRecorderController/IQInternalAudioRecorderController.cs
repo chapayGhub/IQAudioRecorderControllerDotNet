@@ -176,6 +176,7 @@ namespace IQAudioRecorderController {
 					NumberChannels = 2,
 				};
 
+
 				NSError err = null;
 
 				m_audioRecorder = AVAudioRecorder.Create (NSUrl.FromFilename (m_recordingFilePath), audioSettings,out err);
@@ -269,14 +270,18 @@ namespace IQAudioRecorderController {
 			base.ViewDidDisappear (animated);
 
             //     
-             m_audioPlayer.Delegate = null;
-			m_audioPlayer.Stop ();
-             m_audioPlayer = null;
+			if (m_audioPlayer != null) 
+			{
+				m_audioPlayer.Delegate = null;
+				m_audioPlayer.Stop ();
+				m_audioPlayer = null;
+			}
              
-             m_audioRecorder.Delegate = null;
-			m_audioRecorder.Stop();
-             m_audioRecorder = null;
-             
+			if (m_audioRecorder != null) {
+				m_audioRecorder.Delegate = null;
+				m_audioRecorder.Stop ();
+				m_audioRecorder = null;
+			}
 			StopUpdatingMeter ();
 
         }
@@ -299,7 +304,7 @@ namespace IQAudioRecorderController {
 				this.NavigationItem.Title = NSStringExtensions.TimeStringForTimeInterval (m_audioRecorder.currentTime);
 
 		     }
-			else if (m_audioPlayer.Playing)
+			else if (m_audioPlayer != null && m_audioPlayer.Playing)
 			{
 				m_audioPlayer.UpdateMeters();
 
@@ -323,7 +328,9 @@ namespace IQAudioRecorderController {
 		/// </summary>
         private void StartUpdatingMeter() 
 		{
-			mmeterUpdateDisplayLink.Invalidate ();
+			if (mmeterUpdateDisplayLink != null)
+				mmeterUpdateDisplayLink.Invalidate ();
+			
 			mmeterUpdateDisplayLink = CADisplayLink.Create (UpdateMeters);
 			mmeterUpdateDisplayLink.AddToRunLoop (NSRunLoop.Current, NSRunLoopMode.Common);
 
@@ -516,7 +523,9 @@ namespace IQAudioRecorderController {
 
                 this.NavigationItem.TitleView = m_viewPlayerDuration;
 
-				mplayProgressDisplayLink.Invalidate ();
+				if (mplayProgressDisplayLink != null)
+					mplayProgressDisplayLink.Invalidate ();
+				
 				mplayProgressDisplayLink = CADisplayLink.Create (UpdatePlayProgress);
 				mplayProgressDisplayLink.AddToRunLoop (NSRunLoop.Current, NSRunLoopMode.Common);
 

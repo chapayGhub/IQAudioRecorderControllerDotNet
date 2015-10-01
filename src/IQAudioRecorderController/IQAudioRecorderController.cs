@@ -31,13 +31,22 @@ namespace IQAudioRecorderController {
         }
         #endregion
         
+		#region Constructor
+
+		public IQAudioRecorderController ()
+		{
+			m_internalController = new IQInternalAudioRecorderController();
+		}
+
+		#endregion
+
         #region Methods
         public override void ViewDidLoad() {
 
 			base.ViewDidLoad ();
 
             //     
-			m_internalController = new IQInternalAudioRecorderController();
+
             m_internalController.Delegate = this.Delegate;
 
             //     
