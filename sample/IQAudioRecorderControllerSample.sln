@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQAudioRecorderControllerSa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQAudioRecorderController", "..\src\IQAudioRecorderController\IQAudioRecorderController.csproj", "{5187E5C0-E4F9-4B5E-AC38-F0472B95258B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQAudioRecorderController Demo", "..\src\IQAudioRecorderController Demo\IQAudioRecorderController Demo.csproj", "{995F7117-F6B2-48EC-AA68-A0A0DD371175}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
@@ -31,14 +29,6 @@ Global
 		{5187E5C0-E4F9-4B5E-AC38-F0472B95258B}.Release|iPhone.Build.0 = Release|iPhone
 		{5187E5C0-E4F9-4B5E-AC38-F0472B95258B}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{5187E5C0-E4F9-4B5E-AC38-F0472B95258B}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Debug|iPhone.ActiveCfg = Debug|iPhone
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Debug|iPhone.Build.0 = Debug|iPhone
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Release|iPhone.ActiveCfg = Release|iPhone
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Release|iPhone.Build.0 = Release|iPhone
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
-		{995F7117-F6B2-48EC-AA68-A0A0DD371175}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		
 	EndGlobalSection
 EndGlobal
