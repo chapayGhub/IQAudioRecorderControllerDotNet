@@ -63,27 +63,11 @@ namespace IQAudioRecorderController {
         private UIColor m_recordingTintColor;
         
         private UIColor m_playingTintColor;
-        
-        private IQAudioRecorderControllerDelegate _Delegate;
-        
+       
         private Boolean m_ShouldShowRemainingTime;
         #endregion
         
         #region Properties
-
-		/// <summary>
-		/// Gets or sets the delegate.
-		/// </summary>
-		/// <value>The delegate.</value>
-        public IQAudioRecorderControllerDelegate Delegate {
-            get {
-                return this._Delegate;
-            }
-            set {
-                this._Delegate = value;
-            }
-        }
-        
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this
@@ -98,6 +82,19 @@ namespace IQAudioRecorderController {
                 this.m_ShouldShowRemainingTime = value;
             }
         }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance cancel action.
+		/// </summary>
+		/// <value><c>true</c> if this instance cancel action; otherwise, <c>false</c>.</value>
+		internal Action<IQAudioRecorderViewController> CancelControllerAction { get; set;}
+
+		/// <summary>
+		/// Gets or sets the recording complete action.
+		/// </summary>
+		/// <value>The recording complete action.</value>
+		internal Action<IQAudioRecorderViewController, string> RecordingCompleteAction { get; set;}
+
         #endregion
         
         #region Methods
@@ -418,10 +415,10 @@ namespace IQAudioRecorderController {
         
 		private void CancelAction(object item, EventArgs args) 
 		{
-			if (this.Delegate != null) 
+			if (CancelControllerAction != null) 
 			{
-				var controller = (IQAudioRecorderController)this.NavigationController;
-				this.Delegate.AudioRecorderControllerDidCancel (controller);
+				var controller = (IQAudioRecorderViewController)this.NavigationController;
+				CancelControllerAction (controller);
 			}
 
 			this.DismissViewController (true, null);
@@ -430,10 +427,10 @@ namespace IQAudioRecorderController {
         
 		private void DoneAction(object item, EventArgs args) {
 
-			if (this.Delegate != null) 
+			if (RecordingCompleteAction != null) 
 			{
-				var controller = (IQAudioRecorderController)this.NavigationController;
-				this.Delegate.AudioRecorderController (controller, m_recordingFilePath);
+				var controller = (IQAudioRecorderViewController)this.NavigationController;
+				RecordingCompleteAction (controller, m_recordingFilePath);
 			}
 
 			this.DismissViewController (true, null);

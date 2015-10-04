@@ -74,11 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="IIQAudioRecorderControllerDelegate.cs" />
     <Compile Include="NSStringExtensions.cs" />
-    <Compile Include="IQAudioRecorderController.cs" />
     <Compile Include="IQInternalAudioRecorderController.cs" />
     <Compile Include="SCSiriWaveformView.cs" />
+    <Compile Include="IQAudioRecorderViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

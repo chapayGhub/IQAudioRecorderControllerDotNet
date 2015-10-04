@@ -87,7 +87,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\src\IQAudioRecorderController\IQAudioRecorderController.csproj">
+    <ProjectReference Include="..\..\source\IQAudioRecorderController\IQAudioRecorderController.csproj">
       <Project>{5187E5C0-E4F9-4B5E-AC38-F0472B95258B}</Project>
       <Name>IQAudioRecorderController</Name>
     </ProjectReference>
