@@ -22,7 +22,7 @@ namespace IQAudioRecorderController {
         
         private nfloat _Amplitude;
         
-        private nfloat _Density;
+        private float _Density;
         
         private nfloat _PhaseShift;
         
@@ -106,7 +106,7 @@ namespace IQAudioRecorderController {
             }
         }
         
-        public nfloat Density {
+        public float Density {
             get {
                 return this._Density;
             }
@@ -153,7 +153,7 @@ namespace IQAudioRecorderController {
              this.PhaseShift = -0.15f;
              this.Density = 5.0f;
              
-			this.WaveColor = UIColor.White;
+			 this.WaveColor = UIColor.White;
              this.PrimaryWaveLineWidth = 3.0f;
              this.SecondaryWaveLineWidth = 1.0f;
              
@@ -188,9 +188,9 @@ namespace IQAudioRecorderController {
 
 		 	for(nuint i=0; i < this.NumberOfWaves; i++) {
 		 		
-		         var context2 = UIGraphics.GetCurrentContext();
+				context = UIGraphics.GetCurrentContext();
 		         
-				context2.SetLineWidth(i==0 ? this.PrimaryWaveLineWidth : this.SecondaryWaveLineWidth);
+				context.SetLineWidth(i == 0 ? this.PrimaryWaveLineWidth : this.SecondaryWaveLineWidth);
 		 		
 				var halfHeight = this.Bounds.Height / 2.0f;
 				var width = this.Bounds.Width;
@@ -199,34 +199,38 @@ namespace IQAudioRecorderController {
 		 		var maxAmplitude = halfHeight - 4.0f; // 4 corresponds to twice the stroke width
 		 		
 		 		// Progress is a value between 1.0 and -0.5, determined by the current wave idx, which is used to alter the wave's amplitude.
-		 		var progress = 1.0f - i / this.NumberOfWaves;
+				var progress = 1.0f - ((float)i / (float)this.NumberOfWaves);
 		 		var normedAmplitude = (1.5f * progress - 0.5f) * this.Amplitude;
 		 		
 		         var multiplier = Math.Min(1.0, (progress / 3.0f * 2.0f) + (1.0f / 3.0f));
 
-				this.WaveColor.ColorWithAlpha((nfloat)multiplier * this.WaveColor.CGColor.Alpha).SetFill();
-
-		        // [[this.waveColor colorWithAlphaComponent:multiplier * CGColorGetAlpha(this.waveColor.CGColor)] set];
-		 		
-		 		for(Double x = 0; x<width + this.Density; x += this.Density) {
+				this.WaveColor.ColorWithAlpha ((nfloat)multiplier * this.WaveColor.CGColor.Alpha).SetStroke ();
+									
+		 		for(float x = 0; x < width + this.Density; x += this.Density) {
 		 			
 		 			// We use a parable to scale the sinus wave, that has its peak in the middle of the view.
-					var scaling = -Math.Pow(1 / mid * (x - mid), 2) + 1;
+					var scaling = -Math.Pow(1.0f / mid * (x - mid), 2.0f) + 1.0f;
 		 						
 					var y = scaling * maxAmplitude * normedAmplitude * Math.Sin(2 * Math.PI * (x / width) * this.Frequency + this.Phase) + halfHeight;
-		 			
-		 			if (x==0) 
+						
+					y = y+i;
+
+		 			if (x == 0) 
 					{
-						context2.MoveTo( (nfloat)x, (nfloat)y);
+						context.MoveTo( (nfloat)x, (nfloat)y);
 		             }
 		 			else {
-						context2.AddLineToPoint((nfloat)x, (nfloat)y);
+						context.AddLineToPoint((nfloat)x, (nfloat)y);
 		             }
+
+
 		 		}
+
+				context.StrokePath();
 			}
 
 
-			context.StrokePath();
+
         }
         #endregion
     }

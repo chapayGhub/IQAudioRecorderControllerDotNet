@@ -14,6 +14,9 @@ namespace IQAudioRecorderController {
 	/// </summary>
 	public delegate void RecordingCancelledDelegate(IQAudioRecorderViewController controller);
 
+	/// <summary>
+	/// IQAudioRecorderViewController
+	/// </summary>
     public class IQAudioRecorderViewController : UINavigationController {
         
         #region Fields
@@ -33,13 +36,72 @@ namespace IQAudioRecorderController {
 		/// </summary>
 		public event RecordingCompletedDelegate OnRecordingCompleted = delegate { };
 
+		/// <summary>
+		/// Gets/Sets the wave colour when nothing is happenening
+		/// </summary>
+		/// <value>The color of the normal tint.</value>
+		public UIColor NormalTintColor
+		{
+			get 
+			{
+				return InternalPlayer.NormalTintColor;
+			}
+			set
+			{
+				InternalPlayer.NormalTintColor = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets/Sets the wave colour during recording
+		/// </summary>
+		/// <value>The color of the recording tint.</value>
+		public UIColor RecordingTintColor
+		{
+			get 
+			{
+				return InternalPlayer.RecordingTintColor;
+			}
+			set
+			{
+				InternalPlayer.RecordingTintColor = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets/Sets the wave colour during recording
+		/// </summary>
+		/// <value>The color of the recording tint.</value>
+		public UIColor PlayingTintColor
+		{
+			get 
+			{
+				return InternalPlayer.PlayingTintColor;
+			}
+			set
+			{
+				InternalPlayer.PlayingTintColor = value;
+			}
+		}
+
+		internal IQInternalAudioRecorderController InternalPlayer
+		{
+			get 
+			{
+				if (m_internalController == null)
+					m_internalController = new IQInternalAudioRecorderController();
+
+				return m_internalController;
+					
+			}
+		}
         #endregion
         
 		#region Constructor
 
 		public IQAudioRecorderViewController ()
 		{
-			m_internalController = new IQInternalAudioRecorderController();
+			
 		}
 
 		#endregion
@@ -54,7 +116,7 @@ namespace IQAudioRecorderController {
 			base.ViewDidLoad ();
 
             //     
-			m_internalController.CancelControllerAction = (sv) => 
+			InternalPlayer.CancelControllerAction = (sv) => 
 			{
 				this.BeginInvokeOnMainThread (() => 
 					{

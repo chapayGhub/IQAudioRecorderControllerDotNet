@@ -65,6 +65,8 @@ namespace IQAudioRecorderController {
         private UIColor m_playingTintColor;
        
         private Boolean m_ShouldShowRemainingTime;
+
+
         #endregion
         
         #region Properties
@@ -95,6 +97,62 @@ namespace IQAudioRecorderController {
 		/// <value>The recording complete action.</value>
 		internal Action<IQAudioRecorderViewController, string> RecordingCompleteAction { get; set;}
 
+		/// <summary>
+		/// Gets/Sets the wave colour when nothing is happenening
+		/// </summary>
+		/// <value>The color of the normal tint.</value>
+		public UIColor NormalTintColor
+		{
+			get 
+			{
+				if (m_normalTintColor == null)
+					m_normalTintColor = UIColor.White;
+
+				return m_normalTintColor;
+			}
+			set
+			{
+				m_normalTintColor = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets/Sets the wave colour during recording
+		/// </summary>
+		/// <value>The color of the recording tint.</value>
+		public UIColor RecordingTintColor
+		{
+			get 
+			{
+				if (m_recordingTintColor == null)
+					m_recordingTintColor = UIColor.FromRGBA(0.0f/255.0f, 128.0f/255.0f,255.0f/255.0f, 1.0f);
+
+				return m_recordingTintColor;
+			}
+			set
+			{
+				m_recordingTintColor = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets/Sets the wave colour during recording
+		/// </summary>
+		/// <value>The color of the recording tint.</value>
+		public UIColor PlayingTintColor
+		{
+			get 
+			{
+				if (m_playingTintColor == null)
+					m_playingTintColor = UIColor.FromRGBA(255.0f/255.0f, 64.0f/255.0f,64.0f/255.0f,1.0f);
+
+				return m_playingTintColor;
+			}
+			set
+			{
+				m_playingTintColor = value;
+			}
+		}
         #endregion
         
         #region Methods
@@ -131,12 +189,9 @@ namespace IQAudioRecorderController {
 
             // 
              m_navigationTitle = @"Audio Recorder";
-			m_normalTintColor = UIColor.White;
-			m_recordingTintColor = UIColor.FromRGBA(0.0f/255.0f, 128.0f/255.0f,255.0f/255.0f, 1.0f);
-			m_playingTintColor = UIColor.FromRGBA(255.0f/255.0f, 64.0f/255.0f,64.0f/255.0f,1.0f);
 
             //     
-            this.View.TintColor = m_normalTintColor;
+            this.View.TintColor = NormalTintColor;
             mMusicFlowView.BackgroundColor = this.View.BackgroundColor;
 			mMusicFlowView.IdleAmplitude = 0;
 
@@ -204,11 +259,11 @@ namespace IQAudioRecorderController {
 				m_labelCurrentTime = new UILabel ();
 				m_labelCurrentTime.Text = NSStringExtensions.TimeStringForTimeInterval (0);
 				m_labelCurrentTime.Font =  UIFont.BoldSystemFontOfSize(14.0f);
-				m_labelCurrentTime.TextColor = m_normalTintColor;
+				m_labelCurrentTime.TextColor = NormalTintColor;
 				m_labelCurrentTime.TranslatesAutoresizingMaskIntoConstraints = false;
          
 				m_playerSlider = new UISlider(new CGRect(0, 0, this.View.Bounds.Size.Width, 64));
-                 m_playerSlider.MinimumTrackTintColor = m_playingTintColor;
+                 m_playerSlider.MinimumTrackTintColor = PlayingTintColor;
                  m_playerSlider.Value = 0;
 
 				m_playerSlider.TouchDown += SliderStart;
@@ -295,7 +350,7 @@ namespace IQAudioRecorderController {
 		         
 				var normalizedValue = Math.Pow (10, m_audioRecorder.AveragePower(0) / 20);
 		         
-				mMusicFlowView.WaveColor = m_recordingTintColor;
+				mMusicFlowView.WaveColor = RecordingTintColor;
 				mMusicFlowView.UpdateWithLevel ((nfloat)normalizedValue);
 
 				this.NavigationItem.Title = NSStringExtensions.TimeStringForTimeInterval (m_audioRecorder.currentTime);
@@ -307,14 +362,14 @@ namespace IQAudioRecorderController {
 
 				var normalizedValue = Math.Pow (10, m_audioPlayer.AveragePower(0) / 20);
 
-				mMusicFlowView.WaveColor = m_playingTintColor;
+				mMusicFlowView.WaveColor = PlayingTintColor;
 				mMusicFlowView.UpdateWithLevel ((nfloat)normalizedValue);
 
 			}
 		     else
 		     {
 
-				mMusicFlowView.WaveColor = m_normalTintColor;
+				mMusicFlowView.WaveColor = NormalTintColor;
 				mMusicFlowView.UpdateWithLevel (0);
 		     }
 
@@ -446,7 +501,7 @@ namespace IQAudioRecorderController {
                  {
 					this.ShowNavigationButton(false);
 
-                    m_recordButton.TintColor = m_recordingTintColor;
+                    m_recordButton.TintColor = RecordingTintColor;
                     m_playButton.Enabled = false;
                     m_trashButton.Enabled = false;
                  }
@@ -469,7 +524,7 @@ namespace IQAudioRecorderController {
                  {
 					this.ShowNavigationButton(true);
 
-                     m_recordButton.TintColor = m_normalTintColor;
+                     m_recordButton.TintColor = NormalTintColor;
                      m_playButton.Enabled = true;
                      m_trashButton.Enabled = true;
                  }

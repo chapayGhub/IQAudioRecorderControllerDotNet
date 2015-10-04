@@ -27,6 +27,10 @@ namespace IQAudioRecorderControllerSample
 		{
 			var controller = new IQAudioRecorderViewController();
 
+			controller.NormalTintColor = UIColor.Green;
+			controller.RecordingTintColor = UIColor.Red;
+			controller.PlayingTintColor = UIColor.Orange;
+
 			controller.OnCancel += AudioRecorderControllerDidCancel;
 			controller.OnRecordingCompleted += AudioRecorderControllerCompleted;
 			this.PresentViewController(controller,true,null);
