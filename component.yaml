@@ -1,0 +1,22 @@
+name: IQAudioRecorderController
+id: iqaudiorecordercontroller
+version: 1.0
+summary: A neat and clean audio recorder
+publisher: Xamarin Inc
+publisher-url: http://www.xamarin.com/
+src-url: https://github.com/newky2k/IQAudioRecorderControllerDotNet
+license: component/License.md
+details: component/Details.md
+getting-started: component/GettingStarted.md
+icons: 
+  - component/icons/iqaudiorecordercontroller_128x128.png
+  - component/icons/iqaudiorecordercontroller_512x512.png
+screenshots:
+   - component/screenshots/screenshot.png
+libraries:
+  ios-unified: 
+    - source/IQAudioRecorderController/bin/Release/IQAudioRecorderController.dll
+samples:
+  "iOS Unified Sample": samples/IQAudioRecorderControllerSample.sln
+build:
+  - source/IQAudioRecorderController.sln
