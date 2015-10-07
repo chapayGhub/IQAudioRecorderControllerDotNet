@@ -5,10 +5,11 @@ IQAudioRecorderController is a drop-in library allows you to record audio within
   
 **Features**  
 
- - Nice simple ViewController to handle reocrding and playback of recordings
+ - Nice simple ViewController to handle recording and playback of recordings
  - Simple API
- 
- 
+ - Async/Await support
+ - Customizable appearance
+
 Attribution
 ----
 

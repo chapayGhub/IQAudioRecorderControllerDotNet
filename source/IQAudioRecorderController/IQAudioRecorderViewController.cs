@@ -1,6 +1,7 @@
 using System;
 using Foundation;
 using UIKit;
+using System.Threading.Tasks;
 
 namespace IQAudioRecorderController {
     
@@ -153,5 +154,62 @@ namespace IQAudioRecorderController {
         }
         
         #endregion
+
+		#region Static Method
+
+		/// <summary>
+		/// Shows the IQAudioRecorderViewController dialog (awaitable)
+		/// </summary>
+		/// <returns>The the path to the recorded file.  Will be empty if cancelled</returns>
+		/// <param name="vc">The view controller that will present the view controller(Required).</param>
+		/// <param name="colors">Colors arrays to set Normal, Recording and Playing wave tint colors(in that order)</param>
+		public static Task<String> ShowDialogTask(UIViewController vc, UIColor[] colors = null)
+		{
+			if (vc == null)
+				throw new Exception ("You must provide a ViewController to IQAudioRecorderViewController.ShowDialogAsync");
+			
+			var tcs = new TaskCompletionSource<String> ();
+
+			new NSObject ().BeginInvokeOnMainThread (() => {
+
+				var controller = new IQAudioRecorderViewController();
+
+				if (colors != null && colors.Length > 0)
+				{
+					if (colors.Length > 1)
+					{
+						controller.NormalTintColor = colors[0];
+					}
+
+					if (colors.Length > 2)
+					{
+						controller.RecordingTintColor = colors[1];
+					}
+
+					if (colors.Length > 3)
+					{
+						controller.PlayingTintColor = colors[2];
+					}
+
+				}
+
+				controller.OnCancel += (contr) => 
+				{
+					tcs.SetResult(null);
+				};
+
+				controller.OnRecordingCompleted += (contr, fileName) => 
+				{
+					tcs.SetResult(fileName);
+				};
+
+				vc.PresentViewController(controller,true,null);
+
+			});
+
+			return tcs.Task;
+		}
+
+		#endregion
     }
 }

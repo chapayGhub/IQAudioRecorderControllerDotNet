@@ -18,6 +18,10 @@ namespace IQAudioRecorderControllerSample
 		[GeneratedCode ("iOS Designer", "1.0")]
 		partial void OnShowClicked (UIButton sender);
 
+		[Action ("OnShowDialogTask:")]
+		[GeneratedCode ("iOS Designer", "1.0")]
+		partial void OnShowDialogTask (UIButton sender);
+
 		void ReleaseDesignerOutlets ()
 		{
 		}

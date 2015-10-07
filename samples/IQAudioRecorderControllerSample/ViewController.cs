@@ -23,6 +23,10 @@ namespace IQAudioRecorderControllerSample
 			// Release any cached data, images, etc that aren't in use.
 		}
 
+		/// <summary>
+		/// Raises the show clicked event.
+		/// </summary>
+		/// <param name="sender">Sender.</param>
 		partial void OnShowClicked (UIButton sender)
 		{
 			var controller = new IQAudioRecorderViewController();
@@ -37,6 +41,25 @@ namespace IQAudioRecorderControllerSample
 
 		}
 
+		/// <summary>
+		/// Raises the show dialog task event.
+		/// </summary>
+		/// <param name="sender">Sender.</param>
+		async partial void OnShowDialogTask (UIButton sender)
+		{
+			var colors = new UIColor[]{UIColor.Green, UIColor.Red, UIColor.Orange};
+
+			var result = await IQAudioRecorderViewController.ShowDialogTask(this, colors);
+
+			if (!string.IsNullOrWhiteSpace(result))
+			{
+				ShowMessage("File recorded", result);
+			}
+			else
+			{
+				ShowMessage("Record cancelled", "Recording was canelled");
+			}
+		}
 
 
 		#region IIQAudioRecorderControllerDelegate implementation
@@ -46,15 +69,8 @@ namespace IQAudioRecorderControllerSample
 			controller.OnCancel -= AudioRecorderControllerDidCancel;
 			controller.OnRecordingCompleted -= AudioRecorderControllerCompleted;
 
-			var alert = UIAlertController.Create ("File recorded", filePath, UIAlertControllerStyle.Alert);
 
-			alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, (obj)=>
-				{
-					alert.DismissViewController(true,null);
-
-				}));
-			
-			this.PresentViewController (alert, true, null);
+			ShowMessage("File recorded", filePath);
 
 		}
 
@@ -63,17 +79,23 @@ namespace IQAudioRecorderControllerSample
 			controller.OnCancel -= AudioRecorderControllerDidCancel;
 			controller.OnRecordingCompleted -= AudioRecorderControllerCompleted;
 
-			var alert = UIAlertController.Create ("Record cancelled", "Recording was canelled", UIAlertControllerStyle.Alert);
+			ShowMessage("Record cancelled", "Recording was canelled");
+
+		}
+
+		public void ShowMessage(String title, String message)
+		{
+			var alert = UIAlertController.Create (title, message, UIAlertControllerStyle.Alert);
 
 			alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, (obj)=>
 				{
 					alert.DismissViewController(true,null);
 
 				}));
-
+			
 			this.PresentViewController (alert, true, null);
 		}
-
+			
 		#endregion
 	}
 }
