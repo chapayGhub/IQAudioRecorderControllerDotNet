@@ -12,11 +12,14 @@ icons:
   - component/icons/iqaudiorecordercontroller_128x128.png
   - component/icons/iqaudiorecordercontroller_512x512.png
 screenshots:
-   - component/screenshots/screenshot.png
+  - component/screenshots/screenshot.png
 libraries:
   ios-unified: 
     - source/IQAudioRecorderController/bin/Release/IQAudioRecorderController.dll
 samples:
-  "iOS Unified Sample": samples/IQAudioRecorderControllerSample.sln
+  - name: "iOS Sample"
+    path: samples/IQAudioRecorderControllerSample.sln
+    configuration: "Release|iPhone"
+    nobuild: true
 build:
   - source/IQAudioRecorderController.sln
