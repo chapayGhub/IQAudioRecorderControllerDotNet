@@ -28,7 +28,7 @@ namespace IQAudioRecorderController {
         #region Properties
 					
 		/// <summary>
-		/// Occurs when on recording is cancelled
+		/// Occurs when recording is cancelled
 		/// </summary>
 		public event RecordingCancelledDelegate OnCancel  = delegate {};
 
@@ -100,6 +100,9 @@ namespace IQAudioRecorderController {
         
 		#region Constructor
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="IQAudioRecorderController.IQAudioRecorderViewController"/> class.
+		/// </summary>
 		public IQAudioRecorderViewController ()
 		{
 			

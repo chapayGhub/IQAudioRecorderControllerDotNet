@@ -1,106 +1,84 @@
-# JVMenuPopover  
+# IQAudioRecorderController  
 
-This is a simple menu controller where I tried to simulate the native iOS animation of switching between apps. It can be used in many different ways and you can also customize it to use your own animations.  
+IQAudioRecorderController is a drop-in library allows you to record audio within the app with a nice User Interface. The Audio Recorder produces an .m4a file and returns the path so you can integrate it into your application.  
   
 Usage  
 ----
   
-**Navigation Controller Mode**  
+### IQAudioRecorderController ###
   
-If you wish for `JVMenuPopover` to operate as a navigation controller then you will need to use sub-classes of `JVMenuViewController`   
-  
-This will provide a menu button on each view controller from the menu and handle displaying and switching between views.  
-  
-Typically this will use a shared menu from `JVMenuPopoverConfig.SharedInstance.MenuItems`.  
-  
-This method can be seen demonstrated in the `JVMenuPopoveNavigationSample`  
-  
-**Navigation Controller Mode**  
-  
-If you would like `JVMenuPopover` to operate as simply a menu then you just need to add a `JVMenuPopoverViewController` object to your view controller and call the `ShowMenuFromController` method to display it.  
-  
-If you want to have a different menu on each instance of `JVMenuPopoverViewController` you can pass a `List<JVMenuItem>` through as part of the constructor, or it can use a shared menu from `JVMenuPopoverConfig.SharedInstance.MenuItems` if you use the default constructor.   
-  
-This method can be seen demonstrated in the `JVMenuPopoverMenuSample`  
-  
-**Defining a menu**  
-  
-The API for the `JVMenuPopover` for Xamarin.iOS is different to the original API, in that it is now designed to be used as a library rather than compiled in to you application as source.  
-  
-As such this means that it works differently.  
-  
-The menu is made up of a list of `JVMenuItem` items, or rather sub-classes of `JVMenuItem`.  We provide two such classes(and a Generic version of one) to enable you to define both View Controllers and Actions in you menu.  
-  
- - `JVMenuActionItem`  
-  - Call an `Action` on the UI thread when the item is selected  
- - `JVMenuViewControllerItem` and `JVMenuViewControllerItem<T>`  
-  - Attach and show a view controller when the item is shown.  
-  - `JVMenuViewControllerItem<T>` can generate a new instance of the view controller each time the item is selected or keep a single instance of it
+`IQAudioRecorderController` is the pre-built ViewController that handles the recording and playback.  It uses `AVAudioPlayer` and `AVAudioRecorder` elements from the `AV Foundation` framework.  
 
-Below is an example of a shared menu definition using `JVMenuPopoverConfig.SharedInstance.MenuItems`  
-	
-	//build the shared menu
-	JVMenuPopoverConfig.SharedInstance.MenuItems = new List<JVMenuItem>()
-	{
-		new JVMenuViewControllerItem()
-		{
-			//New view controller, will be reused everytime the item is selected
-			Icon = UIImage.FromBundle(@"about-48"),
-			Title = @"About Us",
-			ViewController = new JVMenuSecondController(),
-		},
-		new JVMenuViewControllerItem<JVMenuFifthController>()
-		{
-			//New view controller, will be recreated afresh everytime the item is selected
-			Icon = UIImage.FromBundle(@"ask_question-48"),
-			Title = @"Help?",
-			AlwaysNew = true,
-		},
-		new JVMenuActionItem()
-		{
-			//Action is called, on the UI thread, everytime the item is selected
-			Icon = UIImage.FromBundle(@"ask_question-48"),
-			Title = @"Logout",
-			Command = ()=>
+To show the view controller create a new instance of `IQAudioRecorderController` and present it using an existing `UIViewController`.
+
+			var controller = new IQAudioRecorderViewController();
+
+			this.PresentViewController(controller,true,null);
+  
+Once the `IQAudioRecorderController` instance has been presented you can click the microphone to record, the play button to hear what you have recorded and delete to remove the recording.
+
+Then click `Done` to keep the recording or cancel to delete it, and return to the previous view.
+
+#### Properties ####
+
+There are a number of properties on `IQAudioRecorderController` to help configure the appearance of the record view.
+
+ - NormalTintColor
+  - The color of the wave line when it is neither playing or recording
+ - RecordingTintColor
+  - The color of the wave line when it is recording
+ - PlayingTintColor
+  - The color of the wave line when it is playing
+
+			var controller = new IQAudioRecorderViewController();
+
+			controller.NormalTintColor = UIColor.Green;
+			controller.RecordingTintColor = UIColor.Red;
+			controller.PlayingTintColor = UIColor.Orange;
+
+			this.PresentViewController(controller,true,null);
+
+#### Events ####
+
+Two events are provided on `IQAudioRecorderController` to respond to the results of the ViewController
+
+
+ - OnCancel
+  - Called when the `Cancel` button is pressed
+ - OnRecordingCompleted
+  - Called then the `Done` button is pressed.  Returns the path to the recording
+
+			var controller = new IQAudioRecorderViewController();
+			
+			controller.OnCancel += AudioRecorderControllerDidCancel;
+			controller.OnRecordingCompleted += AudioRecorderControllerCompleted;
+			
+			this.PresentViewController(controller,true,null);
+			
+### Async/Await Support ###
+
+`IQAudioRecorderController` also provides an awaitable task static method which allows you to `await` the result of the recorder view controller.
+
+`IQAudioRecorderViewController.ShowDialogTask` takes a `UIViewController` parameter and a `UIColor` array to set the wave line colors.
+
+
+			var colors = new UIColor[]{UIColor.Green, UIColor.Red, UIColor.Orange};
+
+			var result = await IQAudioRecorderViewController.ShowDialogTask(this, colors);
+
+			if (!string.IsNullOrWhiteSpace(result))
 			{
-				var uiAlert = new UIAlertView("Logout","Are you sure you want to log out?",null,"No","Yes");
-				uiAlert.Show();
-				},
-		},
-	};
+				ShowMessage("File recorded", result);
+			}
+			else
+			{
+				ShowMessage("Record cancelled", "Recording was canelled");
+			}
 
-  
-You can also pass the `List<JVMenuItem>` to the constructor of `JVMenuPopoverViewController` and `JVMenuViewController`  
-
-**Configuring the menu appearance** 
-
-`JVMenuPopoverConfig` now has several new properties to configure the appearance of the menu.  This are.  
-
-- FontName   
- - Select the font type to use in the menu  
-- FontSize  
- - Select the size of the font  
-- RowHeight  
- - Provide the Height of the rows in the menu's tableview  
-- TintColor  
- - The Selected tint color for the icons(when using UIImageRenderingMode.AlwaysTemplate) and text  
-- MenuImage
- - The image to use for the menu toggle button
-- CancelImage
- - The image to use for the cancel button
-- DisableMenuImageTinting  
-  - Disable application of the tint color to the Menu Image
-- DisableCancelImageTinting  
-  - Disable application of the tint color to the Cancel Image  
-
-These properties are all access from the singleton instance of the `JVMenuPopoverConfig` class, `JVMenuPopoverConfig.SharedInstance`  
-  
-  
 Attribution  
 ----
   
-This component is a port to C# from the original Objective-C repo created by [Jorge Valbuena](https://github.com/JV17/JVMenuPopover)  
-	
+This component is a port to C# from the original Objective-C repo created by [Mohd Iftekhar Qurashi](https://github.com/hackiftekhar/IQAudioRecorderController)  
 	
  
 
