@@ -621,29 +621,55 @@ namespace IQAudioRecorderController {
 		/// </summary>
 		/// <param name="item">Item.</param>
 		/// <param name="args">Arguments.</param>
-		private void DeleteAction(object item, EventArgs args) 
-		{
-			UIActionSheet actionSheet = new UIActionSheet (String.Empty, null, "Cancel", "Delete Recording", null);
-			actionSheet.Tag = 1;
+        private void DeleteAction(object item, EventArgs args) 
+        {
+            UIAlertController alert = UIAlertController.Create(null, String.Empty, UIAlertControllerStyle.ActionSheet);
 
-			actionSheet.Clicked += delegate(object sender, UIButtonEventArgs e) {
 
-				if (e.ButtonIndex == ((UIActionSheet)sender).DestructiveButtonIndex)
-		         {
-					File.Delete(m_recordingFilePath);
-		             
-		             m_playButton.Enabled = false;
-		             m_trashButton.Enabled = false;
+            UIActionSheet actionSheet = new UIActionSheet( String.Empty, null, "Cancel", "Delete Recording", null);
+            actionSheet.Tag = 1;
 
-					this.NavigationItem.SetRightBarButtonItem(null,true);
+            UIAlertAction action1 = UIAlertAction.Create("Delete Recording", UIAlertActionStyle.Destructive, (UIAlertAction action)=>
+            {
+                File.Delete(m_recordingFilePath);
 
-		             this.NavigationItem.Title = m_navigationTitle;
-		         }
+                m_playButton.Enabled = false;
+                m_trashButton.Enabled = false;
 
-			};
-			actionSheet.ShowInView (this.View);
-		
+                this.NavigationItem.SetRightBarButtonItem(null,true);
+
+                this.NavigationItem.Title = m_navigationTitle;
+            });
+
+            UIAlertAction action2 = UIAlertAction.Create("Cancel", UIAlertActionStyle.Default, null);
+            alert.AddAction(action1);
+            alert.AddAction(action2);
+            this.PresentViewControllerAsync(alert, true);
         }
+
+//		private void DeleteAction(object item, EventArgs args) 
+//		{
+//			UIActionSheet actionSheet = new UIActionSheet( String.Empty, null, "Cancel", "Delete Recording", null);
+//			actionSheet.Tag = 1;
+//
+//			actionSheet.Clicked += delegate(object sender, UIButtonEventArgs e) {
+//
+//				if (e.ButtonIndex == ((UIActionSheet)sender).DestructiveButtonIndex)
+//		         {
+//					File.Delete(m_recordingFilePath);
+//		             
+//		             m_playButton.Enabled = false;
+//		             m_trashButton.Enabled = false;
+//
+//					this.NavigationItem.SetRightBarButtonItem(null,true);
+//
+//		             this.NavigationItem.Title = m_navigationTitle;
+//		         }
+//
+//			};
+//			actionSheet.ShowInView (this.View);
+//		
+//        }
         
         /// <summary>
         /// Shows the navigation button.
