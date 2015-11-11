@@ -645,31 +645,7 @@ namespace IQAudioRecorderController {
             alert.AddAction(action1);
             alert.AddAction(action2);
             this.PresentViewControllerAsync(alert, true);
-        }
-
-//		private void DeleteAction(object item, EventArgs args) 
-//		{
-//			UIActionSheet actionSheet = new UIActionSheet( String.Empty, null, "Cancel", "Delete Recording", null);
-//			actionSheet.Tag = 1;
-//
-//			actionSheet.Clicked += delegate(object sender, UIButtonEventArgs e) {
-//
-//				if (e.ButtonIndex == ((UIActionSheet)sender).DestructiveButtonIndex)
-//		         {
-//					File.Delete(m_recordingFilePath);
-//		             
-//		             m_playButton.Enabled = false;
-//		             m_trashButton.Enabled = false;
-//
-//					this.NavigationItem.SetRightBarButtonItem(null,true);
-//
-//		             this.NavigationItem.Title = m_navigationTitle;
-//		         }
-//
-//			};
-//			actionSheet.ShowInView (this.View);
-//		
-//        }
+        }            
         
         /// <summary>
         /// Shows the navigation button.
